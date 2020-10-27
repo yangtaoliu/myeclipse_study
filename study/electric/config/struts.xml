@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+	<!-- 设置UI标签的主题 -->
+	<constant name="struts.ui.theme" value="simple"></constant>
+	<!-- 设置开发模式 -->
+	<constant name="struts.devMode" value="true"></constant>
+	<include file="struts/struts-elecText.xml"></include>
+	<!-- 配置struts的URL访问的后缀，改成do（此处可以不修改，此时默认是.action） -->
+	<constant name="struts.action.extension" value="do"></constant>
+	
+	<!-- 改变struts2上传文件的大小 -->
+	<constant name="struts.multipart.maxSize" value="20097152"></constant>
+	
+	<!-- 替换默认的产生动作类实例的工厂为Spring的 	struts2-spring-plugin-2.3.15.3.jar中struts-plugin.xml已经配置好，复制jar包即可	-->
+	<!--  
+		<constant name="struts.objectFactory" value="spring"></constant>
+	-->
+</struts>

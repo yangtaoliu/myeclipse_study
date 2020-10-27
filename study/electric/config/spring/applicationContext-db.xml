@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd
+           http://www.springframework.org/schema/aop 
+           http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+           http://www.springframework.org/schema/tx 
+           http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+           
+  	
+	<!-- 开启对注解的支持，组件的自动扫描，扫描在类上定义的@Controller @Service @Repositiry注解，范围是cn.study.elec的包 -->
+<!-- 	<context:component-scan base-package="cn.study.elec"/> -->
+  	
+  	
+  	<!-- 
+  		引入prperties配置文件	day03-08-spring数据库的操作框架	视频中介绍
+  		这个类用来解析properties文件
+  		这个类不需要id，在下面用到，而客户端用不到
+  	 -->
+  	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<value>classpath:dbcpconfig.properties</value>
+		</property>
+	</bean>  
+  	<bean id="dataSource" destroy-method="close"
+		class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="initialSize" value="${jdbc.initialSize}" />
+		<property name="maxActive" value="${jdbc.maxActive}" />
+		<property name="maxIdle" value="${jdbc.maxIdle}" />
+		<property name="minIdle" value="${jdbc.minIdle}" />
+		<property name="maxWait" value="${jdbc.maxWait}" />
+	</bean>	
+	<!-- 
+		引入sessionFactory	持久化类映射文件太多时，推荐方式二，这样不用在hibernate.cfg.xml
+							中加入很多映射文件，方式二自动扫描
+	 -->
+<!-- 	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="configLocation">
+			<value>classpath:hibernate/hibernate.cfg.xml</value>
+		</property>
+	</bean>	  -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+	    <property name="dataSource" ref="dataSource"/>
+	    <!-- 
+	    	映射文件所在的路径
+	     -->
+	    <property name="mappingDirectoryLocations">
+	    	<!-- 
+	    		spring容器会去该包及子包下面搜索所有的映射文件
+	    	 -->
+	     	<list>
+	        	<value>classpath:cn/study/elec/domain</value>
+	      	</list>
+	    </property>
+	    <property name="hibernateProperties">
+	    	<props>
+	    		<!-- 配置数据库方言 -->
+	    		<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+	    		<prop key="hibernate.show_sql">true</prop>
+	    		<!-- <prop key="hibernate.format_sql">true</prop> -->
+				<!-- 根据映射产生表结构的类型:
+					create-drop:没有表结构创建，下次启动时删除重新创建。适合学习阶段
+					create：每次hibernate启动的时候，根据映射文件和持久化类生成表
+					update：每次hibernate启动的时候，检查表是否存在，不存在则创建，否则什么都不做
+					validate：通过映射文件检查持久化类与表的匹配
+				-->	    		
+	    		<prop key="hibernate.hbm2ddl.auto">update</prop>
+	    	</props>
+	    </property>
+	</bean>
+	<!-- 
+		事务管理器
+	 -->	
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory"/>
+		</property>
+	</bean>
+	
+	<!-- 
+		事务的声明
+	 -->	
+	<!-- 
+		proxy-target-class="true" 实现接口也使用CJlib代理
+		proxy-target-class="false" 默认   类没有实现接口使用CJlib代理，实现了接口使用jdk代理
+		事务处理：注解，在Service层填写一个注解@Transcational -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>	
+	 
+<!-- 	<tx:advice transaction-manager="transactionManager" id="tx">
+		<tx:attributes>
+			
+				name:目标方法的范围
+				isolation:隔离机制	脏读，虚读，不可重复读	不写为默认 DEFAULT
+				propagation:传播属性  解决事务的嵌套问题	不写为默认 REQUIRED
+				read-only	
+					true：只读事务
+					false:读写事务	
+					
+			<tx:method name="save*" read-only="false"/>
+			<tx:method name="update*" read-only="false"/>
+			<tx:method name="delete*" read-only="false"/>
+			<tx:method name="*" read-only="true"/>
+		</tx:attributes>
+	</tx:advice> -->
+	
+
+<!-- 	<aop:config>
+  		
+  			切入点表达式  确定目标类
+  			
+		<aop:pointcut expression="execution(* cn.study.elec.service.impl.*.*(..))" id="perform"/>
+		<aop:advisor advice-ref="tx" pointcut-ref="perform"/>
+	</aop:config> -->		
+		<!-- 
+			此处为总结内容，和本工程无关
+			ref指向的对象就是切面	这个工程没有，因为切面交给spring了  day02-07
+			<aop:aspect ref="transaction">
+			
+  	    		前置通知	day02-08
+  	    		   1、在目标方法执行之前
+  	    		   2、获取不到目标方法的返回值
+			<aop:before method="beginTransaction" pointcut-ref="perform"/>
+			
+  	    		后置通知
+  	    		   1、后置通知可以获取到目标方法的返回值
+  	    		   2、当目标方法抛出异常，后置通知将不再执行
+  	    	<aop:after-returning method="commit" pointcut-ref="perform" returning="val"/>						
+
+  	    		最终通知
+  	    		   无论目标方法是否抛出异常都将执行
+  	    	<aop:after method="finallyMethod" pointcut-ref="perform"/>
+  	    	
+  	    		异常通知
+  	    	<aop:after-throwing method="throwingMethod" throwing="ex" pointcut-ref="perform"/> 	  	    				
+		
+  	    		环绕通知
+  	    		        能控制目标方法的执行
+  	    		        前置通知和后置通知能在目标方法的前面和后面加一些代码，但是不能控制目标方法的执行
+  	    	<aop:around method="aroundMethod" pointcut-ref="perform"></aop:around>	 		
+		 -->
+
+	
+</beans>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+	"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+<session-factory>
+
+
+
+	<!-- 更换sessionFactory创建方式，使用自动扫描映射文件，该文件不起作用了 -->
+
+
+
+
+
+
+
+
+
+
+
+
+	<!-- 配置Hibernate:属性配置参考  Hibernate发行包\project\etc\hibernate.properties -->
+	<!-- JDBC的基本链接 -->
+	<property name="hibernate.connection.driver_class">
+		com.mysql.jdbc.Driver
+	</property>
+	<property name="connection.username">root</property>
+	<property name="connection.password">root</property>
+	<property name="connection.url">
+		jdbc:mysql://localhost:3306/study_elec?useSSL=false
+	</property>
+	<!-- 配置数据库方言 -->
+	<property name="dialect">
+		org.hibernate.dialect.MySQLDialect
+	</property>
+
+	<!-- 二级缓存供应商 -->
+	<property name="cache.provider_class">
+		org.hibernate.cache.EhCacheProvider
+	</property>
+
+	<!-- 根据映射产生表结构的类型:
+		create-drop:没有表结构创建，下次启动时删除重新创建。适合学习阶段
+		create：每次hibernate启动的时候，根据映射文件和持久化类生成表
+		update：每次hibernate启动的时候，检查表是否存在，不存在则创建，否则什么都不做
+		validate：通过映射文件检查持久化类与表的匹配
+	-->
+	<property name="hibernate.hbm2ddl.auto">update</property>
+	<!-- 显示sql语句及格式：开发调试阶段非常有用 -->
+	<property name="hibernate.show_sql">true</property>
+	<property name="hibernate.format_sql">true</property>
+	<property name="hibernate.connection.autocommit">true</property>	
+	<!-- 在getCurrentSession的时候保存session到localThread中 -->
+	<!-- 	<property name="current_session_context_class">thread</property> -->
+
+
+
+	<!-- 开启查询缓存 -->
+	<!-- 	<property name="cache.use_query_cache">true</property> -->
+	<!-- 告知映射文件 -->
+	<mapping resource="cn/study/elec/domain/ElecText.hbm.xml" />
+
+</session-factory>
+</hibernate-configuration>

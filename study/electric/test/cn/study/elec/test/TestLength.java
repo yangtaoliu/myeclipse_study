@@ -1,0 +1,11 @@
+package cn.study.elec.test;
+
+import org.junit.Test;
+
+public class TestLength {
+	@Test
+	public void testLength(){
+		String s = "5EC37274A90D4701A23A455EA756D6389EE6EA3A767E313F457C277143E97C8400869F7F5294A03D8D5CCCC3C39C157647757B403BBF80C54BD8EA6975AC3D74BC9CC181B9237CAEA4C18D6F6C98F702";
+		System.out.println(s.length());
+	}
+}

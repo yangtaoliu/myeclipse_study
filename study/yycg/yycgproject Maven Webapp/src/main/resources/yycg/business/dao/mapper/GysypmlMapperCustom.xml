@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="yycg.business.dao.mapper.GysypmlMapperCustom" >
+  
+  <!-- 供货商药品目录查询条件 -->
+  <sql id="query_gysypml_where">
+  	<if test="gysypmlCustom!=null">
+  		<if test="gysypmlCustom.usergysid!=null and gysypmlCustom.usergysid!=''">
+  			and g.usergysid = #{gysypmlCustom.usergysid}
+  		</if>
+  		<if test="gysypmlCustom.ypxxid!=null and gysypmlCustom.ypxxid!=''">
+  			and g.ypxxid = #{gysypmlCustom.ypxxid}
+  		</if>
+  	</if>
+  </sql>
+  
+  <!-- 供货商药品目录控制查询条件 -->
+    <sql id="query_gysypml_control_where">
+  	<if test="gysypmlCustom!=null">
+  		<if test="gysypmlCustom.control!=null and gysypmlCustom.control!=''">
+  			and c.control = #{gysypmlCustom.control}
+  		</if>  	
+  		<if test="gysypmlCustom.usergysid!=null and gysypmlCustom.usergysid!=''">
+  			and c.usergysid = #{gysypmlCustom.usergysid}
+  		</if>
+  		<if test="gysypmlCustom.ypxxid!=null and gysypmlCustom.ypxxid!=''">
+  			and c.ypxxid = #{gysypmlCustom.ypxxid}
+  		</if>
+  	</if>
+  </sql>
+  
+  
+  <!-- 供货商药品目录查询 -->
+  <select id="findGysypmlList" parameterType="yycg.business.pojo.vo.GysypmlQueryVo"
+  	resultType="yycg.business.pojo.vo.GysypmlCustom"
+  >
+	select g.ypxxid,g.id as gysypmlid,g.usergysid,u.mc as usergysmc,c.control,d.ghzt as controlmc,d2.jyzt as jyztmc,ypxx.bm,ypxx.mc,ypxx.jx,ypxx.gg,ypxx.zhxs,ypxx.scqymc,ypxx.spmc,ypxx.zbjg from 
+	gysypml g
+	left join
+	gysypml_control c
+	on g.ypxxid = c.ypxxid and g.usergysid = c.usergysid
+	inner join
+	usergys u
+	on g.usergysid = u.id
+	left join (select dictcode,typecode,info as ghzt from dictinfo where typecode='008') d
+	on c.control = d.dictcode
+	inner join ypxx
+	on g.ypxxid = ypxx.id
+	left join (select dictcode,typecode,info as jyzt from dictinfo where typecode='003') d2
+	on ypxx.jyzt = d2.dictcode
+
+	
+	<where>
+		<!-- where标签自动添加一个where并且将拼接后的语句第一个and去掉 -->
+		<include refid="query_gysypml_where"></include>
+		<include refid="yycg.business.dao.mapper.YpxxMapperCustom.query_ypxx_where"></include>
+		<include refid="query_gysypml_control_where"></include>
+	</where>
+	<if test="pageQuery!=null">
+		limit #{pageQuery.PageQuery_start},#{pageQuery.PageQuery_pageSize}
+	</if>		
+  </select>
+  
+  <!-- 供货商药品目录总数查询 -->
+  <select id="findGysypmlCount" parameterType="yycg.business.pojo.vo.GysypmlQueryVo"
+  	resultType="int"
+  >
+	select count(*) from 
+	gysypml g
+	left join
+	gysypml_control c
+	on g.ypxxid = c.ypxxid and g.usergysid = c.usergysid
+	inner join ypxx
+	on g.ypxxid = ypxx.id
+	<where>
+		<!-- where标签自动添加一个where并且将拼接后的语句第一个and去掉 -->
+		<include refid="query_gysypml_where"></include>
+		<include refid="yycg.business.dao.mapper.YpxxMapperCustom.query_ypxx_where"></include>
+		<include refid="query_gysypml_control_where"></include>
+	</where>	
+  </select>  
+  
+  <!-- 供货商药品目录添加查询 -->
+  <select id="findAddGysypmlList" parameterType="yycg.business.pojo.vo.GysypmlQueryVo"
+  	resultType="yycg.business.pojo.vo.GysypmlCustom"
+  	>
+		select id,bm,mc,jx,gg,zhxs,scqymc,spmc,zbjg,d2.jyztmc
+		from 
+		ypxx
+		left join (select dictcode,typecode,info as jyztmc from dictinfo where typecode='003') d2
+		on ypxx.jyzt = d2.dictcode
+		where not exists
+		(select id from gysypml where usergysid = #{gysypmlCustom.usergysid} and ypxx.id = gysypml.ypxxid)	  	
+  		
+  		<include refid="yycg.business.dao.mapper.YpxxMapperCustom.query_ypxx_where"></include>
+	  	<if test="pageQuery!=null">
+			limit #{pageQuery.PageQuery_start},#{pageQuery.PageQuery_pageSize}
+		</if>			
+  	</select>
+  	
+  <!-- 供货商药品目录添加总数 -->
+  <select id="findAddGysypmlCount" parameterType="yycg.business.pojo.vo.GysypmlQueryVo"
+  	resultType="int"
+  	>
+		select count(*)
+		from 
+		ypxx
+		where not exists
+		(select id from gysypml where usergysid = #{gysypmlCustom.usergysid} and ypxx.id = gysypml.ypxxid)
+
+  		<include refid="yycg.business.dao.mapper.YpxxMapperCustom.query_ypxx_where"></include>		
+  	</select> 
+  	
+  	
+  <!-- 监管局控制供货商药品目录查询 -->
+  <select id="findGysypmlControlList" parameterType="yycg.business.pojo.vo.GysypmlQueryVo"
+  	resultType="yycg.business.pojo.vo.GysypmlCustom"
+  >  
+  	select c.ypxxid,c.id as gysypmlcontrolid,c.usergysid,c.advice,u.mc as usergysmc,c.control,d.ghzt as controlmc,d2.jyzt as jyztmc,ypxx.bm,ypxx.mc,ypxx.jx,ypxx.gg,ypxx.zhxs,ypxx.scqymc,ypxx.spmc,ypxx.zbjg from 
+
+	gysypml_control c
+	
+	inner join
+	usergys u
+	on c.usergysid = u.id
+	left join (select dictcode,typecode,info as ghzt from dictinfo where typecode='008') d
+	on c.control = d.dictcode
+	inner join ypxx
+	on c.ypxxid = ypxx.id
+	left join (select dictcode,typecode,info as jyzt from dictinfo where typecode='003') d2
+	on ypxx.jyzt = d2.dictcode
+	
+	<where>
+		<!-- where标签自动添加一个where并且将拼接后的语句第一个and去掉 -->
+		<include refid="yycg.business.dao.mapper.YpxxMapperCustom.query_ypxx_where"></include>
+		<include refid="query_gysypml_control_where"></include>
+	</where>
+	<if test="pageQuery!=null">
+		limit #{pageQuery.PageQuery_start},#{pageQuery.PageQuery_pageSize}
+	</if>	
+  </select> 
+  
+   <!-- 监管局控制供货商药品目录总数查询 -->
+  <select id="findGysypmlControlCount" parameterType="yycg.business.pojo.vo.GysypmlQueryVo"
+  	resultType="int"
+  >
+  	select count(*) from 
+	gysypml_control c
+	inner join ypxx
+	on c.ypxxid = ypxx.id
+	<where>
+		<!-- where标签自动添加一个where并且将拼接后的语句第一个and去掉 -->
+		<include refid="yycg.business.dao.mapper.YpxxMapperCustom.query_ypxx_where"></include>
+		<include refid="query_gysypml_control_where"></include>
+	</where>
+  </select> 
+</mapper>

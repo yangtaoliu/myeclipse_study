@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="cn.study.elec.domain.ElecUser" table="Elec_User">
+		<id name="userID" type="string" column="userID">
+			<generator class="uuid"></generator>
+		</id>
+		<property name="jctID" type="string" column="jctID"></property>
+		<property name="jctUnitID" type="string" column="jctUnitID"></property>
+		<property name="userName" type="string" column="userName"></property>
+		<property name="logonName" type="string" column="logonName"></property>
+		<property name="logonPwd" type="string" column="logonPwd"></property>
+		<property name="sexID" type="string" column="sexID"></property>
+		<property name="birthday" type="date" column="birthday"></property>
+		<property name="address" type="string" column="address"></property>
+		<property name="contactTel" type="string" column="contactTel"></property>
+		<property name="email" type="string" column="email"></property>
+		<property name="mobile" type="string" column="mobile"></property>
+		<property name="isDuty" type="string" column="isDuty"></property>
+		<property name="postID" type="string" column="postID"></property>
+		<property name="onDutyDate" type="date" column="onDutyDate"></property>
+		<property name="offDutyDate" type="date" column="offDutyDate"></property>
+		<property name="remark" type="string" column="remark"></property>
+		
+		<!-- 
+			一个用户对应多个文件
+			cascade
+				null  默认
+				save-update 在保存或者更新classes对象的时候，针对student进行保存或者更新的操作
+				all
+				delete	删除一的一端的时候级联删除多的一端	
+			inverse 关系操作
+				default classes维护classes与student之间的关系
+				true	 不维护
+				false 	维护
+				默认User维护User与UserFile之间的关系(false一样) 改成true之后，不维护关系	
+			order-by
+				排序
+		 -->
+		<set name="elecUserFiles" table="Elec_User_File" inverse="true" order-by="progressTime desc" cascade="delete">
+			<key>
+				<!-- column 外键 告诉hibernate通过userID就可以建立Elec_User和Elec_User_File的关联-->
+				<column name="userID"></column>
+			</key>
+			<!-- 告诉hibernate ElecUser类中的set集合中存放的是哪个元素 -->
+			<one-to-many class="cn.study.elec.domain.ElecUserFile"/>
+		</set> 
+		<!--
+			cascade指的是级联操作，操作的是一般属性，指的是对象与对象的操作
+   			inverse指的是关系操作，针对的就是外键
+			
+		 
+			set元素针对的是Classes类中的Set属性 
+			cascade
+				null  默认
+				save-update 在保存或者更新classes对象的时候，针对user进行保存或者更新的操作
+				all
+				delete
+			inverse 关系操作
+				default user维护user与roles之间的关系
+				true	 不维护，由另外一段维护关系
+				false 	维护
+			默认user维护user与roles之间的关系(false一样) 改成true之后，对方维护关系	
+			lazy
+				true	查询用户的时候不查询角色的信息，等需要用到的时候在查询
+				false	查询用户的时候，立即将角色信息同步查询出来，不建议使用，因为如果表关联过多，不需要查询的对象也加载了，将会降低效率
+		-->		
+		<!-- inverse="true" 角色可以控制用户，用户不能控制角色 -->
+		<set name="elecRoles" table="elec_user_role" inverse="true" >
+			<key>
+				<column name="userID"></column>
+			</key>
+			<many-to-many class="cn.study.elec.domain.ElecRole" column="roleID"/>
+		</set> 
+		
+		
+	</class>
+</hibernate-mapping>

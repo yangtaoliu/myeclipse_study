@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:context="http://www.springframework.org/schema/context"	   
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/aop 
+           http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+           http://www.springframework.org/schema/tx 
+           http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd           ">
+<!-- 1：开启对注解的支持，组件的自动扫描，扫描在类上定义的@Controller @Service @Repository注解，范围是cn.study.elec的包 -->	
+<!-- 	<context:component-scan base-package="cn.study.elec"></context:component-scan> -->
+	<!-- 用注解定义，不需要声明了 -->
+<!-- 	<bean id="elecTextDao" class="cn.study.elec.dao.impl.ElecTextDaoImpl"> 	</bean>-->
+		<!-- 
+			此处为其它地方收集的常用属性，写在这里而已，，没有意义
+			constructor-arg 指的是构造器中的参数
+				index 角标 从0开始
+				value 如果一般类型用value赋值
+				ref 引用类型赋值
+		<constructor-arg index="0" value="666"></constructor-arg>
+		
+		在父类中进行赋值，子类通过 parent属性继承父类内容	
+		在bean标签中添加	parent="person"
+		
+		启动依赖注入的注解解析器	day01-06
+		<context:annotation-config></context:annotation-config>
+
+		component 把一个类放入到spring容器中，该类就是一个component	day01-07
+		在base-package指定的包及子包下扫描所有的类
+		<context:component-scan base-package="cn.study.spring.scan"></context:component-scan>
+		
+		设置初始化方法和销毁方法
+		在bean标签中添加	init-method="init" destroy-method="destory"		
+		
+		
+		 -->	
+<!-- 	使用@Resource注入SessionFactory，不用在这里注入了	
+		<property name="sessionFactory">
+			<ref bean="sessionFactory"/> 
+		</property> -->
+
+<!-- 	<bean id="elecTextService" class="cn.study.elec.service.impl.ElecTextServiceImpl">
+	</bean> -->
+    <!-- 
+    	scope="singleton"默认单例 	"prototype" 每次都创建新实例，多例
+    	name 名字
+    	id 唯一表示
+    	class 类名
+    	factory-method 静态工厂方法
+    	lazy-init 是否懒加载  即调用 getBean 的时候才创建
+    	property 给bean类注入属性
+    		name 属性的名称
+    			value 属性的值，如果是一般类型（基本类型和String）
+    			ref   属性的值，如果是引用类型
+    -->
+<!-- 	<bean id="elecTextAction" class="cn.study.elec.web.action.ElecTextAction"
+		scope="prototype">
+	</bean>
+	<bean id="elecMenuAction" class="cn.study.elec.web.action.elecMenuAction"
+		scope="prototype">
+	</bean> -->
+	
+	<!-- 		启动依赖注入的注解解析器 注意这句要卸载类后面，否则找不到	day01-06 -->
+	<context:annotation-config></context:annotation-config>	
+</beans>

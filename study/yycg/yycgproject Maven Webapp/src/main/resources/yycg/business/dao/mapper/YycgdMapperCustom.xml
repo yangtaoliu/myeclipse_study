@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="yycg.business.dao.mapper.YycgdMapperCustom" >
+	<!-- 以表为单位定义sql片段 -->
+	<!-- 采购单药品明细查询条件 -->
+	<sql id="query_yycgdmx_where">
+		<if test="yycgdmxCustom!=null">
+			<if test="yycgdmxCustom.yycgdid!=null and yycgdmxCustom.yycgdid!=''">
+				and yycgdmx.yycgdid = #{yycgdmxCustom.yycgdid}
+			</if>
+			<if test="yycgdmxCustom.cgzt!=null and yycgdmxCustom.cgzt!=''">
+				and yycgdmx.cgzt = #{yycgdmxCustom.cgzt}
+			</if>
+		</if>
+	</sql>
+	
+	<!-- 采购单查询条件 -->
+	<sql id="query_yycgd_where">
+		<if test="yycgdCustom!=null">
+			<if test="yycgdCustom.id!=null and yycgdCustom.id!=''">
+				and yycgd.id = #{yycgdCustom.id}
+			</if>
+		</if>
+	</sql>	
+	
+	<!-- 采购单药品明细查询列表 -->
+	<select id="findYycgdmxList" parameterType="yycg.business.pojo.vo.YycgdQueryVo"
+		resultType="yycg.business.pojo.vo.YycgdmxCustom"
+	>
+	select yycgdmx.id yycgdmxid,
+		useryy.id useryyid,
+		useryy.mc useryymc,
+		ypxx.id,
+		ypxx.bm,
+		ypxx.mc,
+		ypxx.jx,
+		ypxx.gg,
+		ypxx.zhxs,
+		ypxx.scqymc,
+		ypxx.spmc,
+
+		ypxx.jyzt,
+
+		(select info
+		from dictinfo
+		where ypxx.jyzt =
+		dictcode
+		and typecode = '003') jyztmc,
+		yycgdmx.zbjg,
+		yycgdmx.jyjg,
+		yycgdmx.cgl,
+		yycgdmx.cgje,
+		yycgdmx.cgzt,
+		(select info
+		from dictinfo
+		where
+		typecode = '011'
+		and dictcode = yycgdmx.cgzt) cgztmc,
+		usergys.mc
+		usergysmc,
+		usergys.id usergysid
+
+		from yycgdmx,
+		yycgd, useryy,
+		ypxx, usergys
+		where yycgdmx.yycgdid
+		= yycgd.id
+		and yycgd.useryyid = useryy.id
+		and yycgdmx.ypxxid = ypxx.id
+		and yycgdmx.usergysid = usergys.id	
+		<!-- 只查询某个采购单下药品明细 -->
+		<include refid="query_yycgdmx_where" />
+		<!-- 药品查询条件 -->
+		<include refid="yycg.business.dao.mapper.YpxxMapperCustom.query_ypxx_where" />	
+		
+		<if test="pageQuery!=null">
+			limit #{pageQuery.PageQuery_start},#{pageQuery.PageQuery_pageSize}
+		</if>		
+	</select>
+	
+		<!-- 采购单药品明细查询列表总数 -->
+	<select id="findYycgdmxCount" parameterType="yycg.business.pojo.vo.YycgdQueryVo"
+		resultType="int">
+ 		select count(*)
+
+		from  yycgdmx,
+		 yycgd, useryy,
+		ypxx, usergys
+		where yycgdmx.yycgdid
+		= yycgd.id
+		and yycgd.useryyid = useryy.id
+		and yycgdmx.ypxxid = ypxx.id
+		and yycgdmx.usergysid = usergys.id 		
+		<!-- 只查询某个采购单下药品明细 -->
+		<include refid="query_yycgdmx_where" />
+		<!-- 药品查询条件 -->
+		<include refid="yycg.business.dao.mapper.YpxxMapperCustom.query_ypxx_where" />		
+	</select>
+			
+</mapper>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="yycg.business.dao.mapper.YpxxMapperCustom" >
+	<!-- 药品目录 查询条件 -->
+	<sql id="query_ypxx_where">
+	  <if test="ypxxCustom!=null">
+		<if test="ypxxCustom.bm!=null and ypxxCustom.bm!=''">
+			and ypxx.bm = #{ypxxCustom.bm}
+		</if>
+		<if test="ypxxCustom.mc!=null and ypxxCustom.mc!=''">
+			and ypxx.mc = #{ypxxCustom.mc}
+		</if>
+		<if test="ypxxCustom.jyzt!=null and ypxxCustom.jyzt!=''">
+			and ypxx.jyzt = #{ypxxCustom.jyzt}
+		</if>
+		<!-- 类别 -->
+		<if test="ypxxCustom.lb!=null and ypxxCustom.lb!=''">
+			and ypxx.lb = #{ypxxCustom.lb}
+		</if>
+		<!-- 价格范围 -->
+		<if test="ypxxCustom.priceStart!=null">
+			and ypxx.zbjg >= #{ypxxCustom.priceStart}
+		</if>	
+		<if test="ypxxCustom.priceEnd!=null">
+			<![CDATA[
+				and ypxx.zbjg <= #{ypxxCustom.priceEnd}
+			]]>
+		</if>			
+		<!-- ...  -->
+	  </if>
+	</sql>
+	
+	<!-- 药品目录查询 -->
+	<select id="findYpxxList" parameterType="yycg.business.pojo.vo.YpxxQueryVo" 
+		resultType="yycg.business.pojo.vo.YpxxCustom">
+		select id,bm,mc,jx,gg,zhxs,scqymc,spmc,zbjg,jyzt ,jyztmc from
+		ypxx
+		left join (select dictcode,typecode,info as jyztmc from dictinfo where typecode='003') d
+		on jyzt = d.dictcode
+	<where>
+		<!-- where标签自动添加一个where并且将拼接后的语句第一个and去掉 -->
+		<include refid="query_ypxx_where"></include>
+	</where>
+	<if test="pageQuery!=null">
+		limit #{pageQuery.PageQuery_start},#{pageQuery.PageQuery_pageSize}
+	</if>	
+	</select>
+	
+  <select id="findYpxxCount" parameterType="yycg.business.pojo.vo.YpxxQueryVo"
+  	resultType="int"
+  >
+   	select count(*) from ypxx 
+   	
+	<where>
+		<!-- where标签自动添加一个where并且将拼接后的语句第一个and去掉 -->
+		<include refid="query_ypxx_where"></include>
+	</where> 	
+  </select>	
+  
+  <select id="findMaxBm" resultType="int">
+  	select max(cast(bm as signed integer)) bm from ypxx;
+  </select>
+  
+</mapper>
